@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RMTechStudio 雲端簽名與側載中心</title>
+    <title>RMTechStudio 無電腦雲端側載中心</title>
     <style>
         :root { --bg: #090d16; --card: #151e32; --border: #26334d; --accent: #38bdf8; --btn: #0284c7; --text: #f1f5f9; --muted: #94a3b8; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
@@ -16,23 +16,27 @@
         .dot { width: 9px; height: 9px; border-radius: 50%; background: #eab308; flex-shrink: 0; }
         .dot.ready { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
         .dot.err { background: #ef4444; }
+        .warn { background: #2a1818; border: 1px solid #7f1d1d; color: #fca5a5; padding: 11px; border-radius: 10px; font-size: 12px; margin-bottom: 14px; line-height: 1.5; }
         .field { margin-bottom: 14px; }
         label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #cbd5e1; }
-        input[type="file"], input[type="password"], input[type="text"] {
+        .udid-row { display: flex; gap: 8px; }
+        input {
             width: 100%; box-sizing: border-box; background: #0f172a; border: 1px solid var(--border);
-            color: var(--text); padding: 10px 12px; border-radius: 10px; font-size: 14px;
+            color: var(--text); padding: 11px 12px; border-radius: 10px; font-size: 14px;
         }
-        .btn { display: block; width: 100%; box-sizing: border-box; text-align: center; background: var(--btn); color: #fff; text-decoration: none; padding: 14px; border-radius: 12px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; margin-top: 10px; }
+        .btn { display: block; width: 100%; box-sizing: border-box; text-align: center; background: var(--btn); color: #fff; text-decoration: none; padding: 13px; border-radius: 12px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; margin-top: 8px; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-sub { background: #1e293b; border: 1px solid var(--accent); color: var(--accent); }
-        #logBox { margin-top: 14px; font-size: 13px; color: var(--accent); text-align: center; display: none; }
+        .btn-udid { white-space: nowrap; padding: 0 14px; margin-top: 0; width: auto; font-size: 13px; }
+        #step2Box { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+        #logBox { margin-top: 14px; font-size: 13px; color: var(--accent); text-align: center; display: none; word-break: break-word; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
-        <h1>RMTechStudio 雲端簽名中心</h1>
-        <p>免電腦即時簽名並透過 Safari 直接安裝 ForgeSign 本地簽名器。</p>
+        <h1>RMTechStudio 無電腦側載中心</h1>
+        <p>免電腦、免找外部證書，直接以個人備用 Apple ID 雲端首次安裝 ForgeSign 簽名器。</p>
         <div class="status-bar">
             <div class="dot" id="statusDot"></div>
             <span id="statusText">正在喚醒雲端簽名引擎（約需 30～50 秒）...</span>
@@ -40,41 +44,60 @@
     </div>
 
     <div class="card">
-        <h2>雲端即時簽名與安裝</h2>
-        <div class="field">
-            <label>1. 選擇憑證檔案 (.p12)</label>
-            <input type="file" id="p12File" accept=".p12">
+        <h2>雲端首次安裝簽名器</h2>
+        <div class="warn">
+            <strong>安全提醒：</strong>請務必另行註冊一組「備用 Apple ID 小號」進行簽名，切勿輸入綁定個人重要資料與付款方式的主帳號。
         </div>
+
         <div class="field">
-            <label>2. 憑證密碼 (.p12 密碼)</label>
-            <input type="password" id="p12Pass" placeholder="無密碼可留空">
+            <label>1. 本機裝置 UDID</label>
+            <div class="udid-row">
+                <input type="text" id="udidInput" placeholder="點擊右側按鈕自動讀取">
+                <a class="btn btn-sub btn-udid" style="display:flex;align-items:center;" href="https://rm-signer-backend-5.onrender.com/api/udid-profile">自動獲取</a>
+            </div>
         </div>
+
         <div class="field">
-            <label>3. 選擇描述檔 (.mobileprovision)</label>
-            <input type="file" id="provFile" accept=".mobileprovision">
+            <label>2. 備用 Apple ID 信箱</label>
+            <input type="email" id="appleIdInput" placeholder="example@icloud.com">
         </div>
+
         <div class="field">
-            <label>4. 自訂 App 顯示名稱（選填）</label>
-            <input type="text" id="appName" placeholder="預設：ForgeSign">
+            <label>3. 備用 Apple ID 密碼</label>
+            <input type="password" id="passInput" placeholder="輸入密碼">
         </div>
-        <button class="btn" id="signBtn" onclick="startSign()">開始雲端簽名並安裝</button>
+
+        <button class="btn" id="startBtn" onclick="startCloudSign()">發送雙重認證並開始簽名</button>
+
+        <div id="step2Box">
+            <div class="field">
+                <label>4. 輸入 6 位數雙重認證 (2FA) 驗證碼</label>
+                <input type="text" id="codeInput" maxlength="6" inputmode="numeric" placeholder="輸入手機彈出的 6 位數驗證碼">
+            </div>
+            <button class="btn" id="verifyBtn" onclick="verifyAndInstall()">驗證並立即安裝</button>
+        </div>
+
         <div id="logBox"></div>
     </div>
 
     <div class="card">
-        <h2>裝好後的自我續簽與軟體源</h2>
-        <p>安裝完成後，請在 ForgeSign 內登入備用 Apple ID 小號，並貼上專屬軟體源下載母體進行自我覆蓋續簽：</p>
+        <h2>裝好後的 7 天免電腦自動續簽</h2>
         <button class="btn btn-sub" onclick="copyRepo()">複製專屬軟體源網址 (repo.json)</button>
         <ol style="padding-left: 18px; margin-top: 12px;">
-            <li>前往 iPhone「設定 &gt; 隱私權與安全性 &gt; 開發者模式」開啟並重開機。</li>
-            <li>打開 ForgeSign 登入備用 Apple ID 並測試 Anisette 連線。</li>
-            <li>貼上軟體源網址下載母體重簽覆蓋，之後每 7 天直接在手機續簽。</li>
+            <li>安裝後前往「設定 &gt; 一般 &gt; VPN 與裝置管理」信任你的 Apple ID 憑證，並於「設定 &gt; 隱私權與安全性」開啟<strong>開發者模式</strong>重開機。</li>
+            <li>打開 ForgeSign 登入同一組備用 Apple ID，貼上軟體源網址下載母體進行自我覆蓋安裝，之後每 7 天直接在手機續簽即可。</li>
         </ol>
     </div>
 </div>
 
 <script>
-const API_BASE = "https://rm-signer-backend-1.onrender.com";
+const API_BASE = "https://rm-signer-backend-5.onrender.com";
+let currentJobId = null;
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('udid')) {
+    document.getElementById('udidInput').value = urlParams.get('udid');
+}
 
 async function wakeServer() {
     const dot = document.getElementById('statusDot');
@@ -84,70 +107,88 @@ async function wakeServer() {
         if (res.ok) {
             const data = await res.json();
             dot.classList.add('ready');
-            txt.textContent = data.busy ? "雲端引擎已就緒（目前有 1 個任務排隊中）" : "雲端引擎已就緒，可隨時開始簽名";
+            txt.textContent = data.busy ? "雲端引擎已就緒（目前有 1 人正在簽名）" : "雲端引擎已就緒，可隨時開始安裝";
         } else {
             throw new Error();
         }
     } catch (e) {
         dot.classList.add('err');
-        txt.textContent = "無法連線至雲端引擎，請稍後重整頁面";
+        txt.textContent = "雲端引擎正在喚醒中，請稍候 30 秒後重整頁面";
     }
 }
 wakeServer();
 
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-async function startSign() {
-    const p12Input = document.getElementById('p12File').files[0];
-    const provInput = document.getElementById('provFile').files[0];
-    const p12Password = document.getElementById('p12Pass').value;
-    const appName = document.getElementById('appName').value.trim();
-    const btn = document.getElementById('signBtn');
+async function startCloudSign() {
+    const udid = document.getElementById('udidInput').value.trim();
+    const appleId = document.getElementById('appleIdInput').value.trim();
+    const password = document.getElementById('passInput').value;
+    const btn = document.getElementById('startBtn');
     const logBox = document.getElementById('logBox');
 
-    if (!p12Input || !provInput) {
-        alert("請先選擇 .p12 憑證與 .mobileprovision 描述檔！");
+    if (!udid || !appleId || !password) {
+        alert("請先點擊「自動獲取」取得 UDID，並填寫備用 Apple ID 與密碼！");
         return;
     }
 
     btn.disabled = true;
     logBox.style.display = 'block';
-    logBox.textContent = "正在讀取憑證並傳送至雲端簽名引擎...";
+    logBox.textContent = "正在連線至蘋果驗證伺服器，請稍候...";
 
     try {
-        const [p12Base64, mobileprovisionBase64] = await Promise.all([
-            fileToBase64(p12Input),
-            fileToBase64(provInput)
-        ]);
-
-        const res = await fetch(`${API_BASE}/api/sign`, {
+        const res = await fetch(`${API_BASE}/api/sign/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                p12Base64,
-                p12Password,
-                mobileprovisionBase64,
-                appName: appName || undefined
-            })
+            body: JSON.stringify({ udid, appleId, password })
         });
-
         const data = await res.json();
+
         if (!res.ok || !data.ok) {
-            throw new Error(data.error || "簽名失敗，請確認憑證密碼是否正確");
+            throw new Error(data.error || "登入請求失敗");
+        }
+
+        if (data.need2FA) {
+            currentJobId = data.jobId;
+            document.getElementById('step2Box').style.display = 'block';
+            logBox.textContent = "已發送驗證碼！請輸入裝置上顯示的 6 位數驗證碼。";
+        } else {
+            logBox.textContent = "簽名完成！正在呼叫系統安裝視窗...";
+            window.location.href = data.itmsLink;
+        }
+    } catch (err) {
+        logBox.textContent = "錯誤：" + err.message;
+        btn.disabled = false;
+    }
+}
+
+async function verifyAndInstall() {
+    const code = document.getElementById('codeInput').value.trim();
+    const btn = document.getElementById('verifyBtn');
+    const logBox = document.getElementById('logBox');
+
+    if (!code || code.length !== 6) {
+        alert("請輸入完整的 6 位數驗證碼！");
+        return;
+    }
+
+    btn.disabled = true;
+    logBox.textContent = "正在向蘋果註冊測試憑證並打包簽名（約需 15 秒）...";
+
+    try {
+        const res = await fetch(`${API_BASE}/api/sign/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jobId: currentJobId, code })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+            throw new Error(data.error || "驗證或簽名失敗");
         }
 
         logBox.textContent = "簽名成功！正在呼叫 iOS 系統安裝器...";
         window.location.href = data.itmsLink;
     } catch (err) {
         logBox.textContent = "錯誤：" + err.message;
-    } finally {
         btn.disabled = false;
     }
 }
