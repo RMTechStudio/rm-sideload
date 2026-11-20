@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMTechStudio iOS 側載中心</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #090d16; color: #f1f5f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { max-width: 420px; width: 100%; }
+        .card { background: #151e32; border-radius: 18px; padding: 22px; margin-bottom: 16px; border: 1px solid #26334d; }
+        h1 { font-size: 20px; margin: 0 0 8px 0; color: #38bdf8; }
+        h2 { font-size: 16px; margin: 0 0 10px 0; }
+        p, li { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+        ol { padding-left: 20px; margin: 0; }
+        .warn { background: #2a1818; border: 1px solid #7f1d1d; color: #fca5a5; padding: 12px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; }
+        .btn { display: block; width: 100%; box-sizing: border-box; text-align: center; background: #0284c7; color: #fff; text-decoration: none; padding: 13px; border-radius: 12px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; margin-top: 12px; }
+        .btn-sub { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>RMTechStudio iOS 側載中心</h1>
+        <p>免電腦在 iPhone 本地使用個人 Apple ID 簽名安裝 IPA。</p>
+        <div class="warn">
+            <strong>安全提醒：</strong>建議另行註冊一組「備用 Apple ID 小號」登入簽名，避免使用綁定重要資料的主帳號。
+        </div>
+        <a class="btn" href="https://github.com/RMTechStudio/ForgeSign-iOS/releases/download/v1.0.0/ForgeSign-latest.ipa">1. 下載簽名器母體 (.ipa)</a>
+        <button class="btn btn-sub" onclick="copyRepo()">2. 複製專屬軟體源網址</button>
+    </div>
+
+    <div class="card">
+        <h2>使用教學（3 步驟完成）</h2>
+        <ol>
+            <li><strong>開啟開發者模式</strong>：前往 iPhone「設定 &gt; 隱私權與安全性 &gt; 開發者模式」開啟並重開機。</li>
+            <li><strong>登入備用 Apple ID</strong>：打開 ForgeSign，進入設定開啟 <code>Use Apple Account provisioning</code>，輸入備用 Apple ID 與 2FA 驗證碼，並測試 Anisette 連線。</li>
+            <li><strong>匯入軟體源與自我續簽</strong>：在 Sources 分頁貼上剛複製的軟體源網址，先下載簽名器母體進行「自我重簽覆蓋安裝」，之後每 7 天在手機上點一下即可免費續簽。</li>
+        </ol>
+    </div>
+</div>
+<script>
+function copyRepo() {
+    navigator.clipboard.writeText("https://rmtechstudio.github.io/ForgeSign-iOS/repo.json");
+    alert("已複製軟體源網址！請打開 ForgeSign 在 Sources 中貼上。");
+}
+</script>
+</body>
+</html>
