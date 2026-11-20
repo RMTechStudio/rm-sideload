@@ -92,6 +92,11 @@
 
 <script>
 const API_BASE = "https://rm-signer-backend-5.onrender.com";
+
+// 新增：你自己的存取 token，必須跟 Render 後端環境變數 ACCESS_TOKEN 設的值完全一樣
+// 請自行替換成你自己的那組字串，不要留著這個範例值
+const MY_ACCESS_TOKEN = "請填入你在Render設定的ACCESS_TOKEN字串";
+
 let currentJobId = null;
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -138,7 +143,7 @@ async function startCloudSign() {
         const res = await fetch(`${API_BASE}/api/sign/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ udid, appleId, password })
+            body: JSON.stringify({ udid, appleId, password, accessToken: MY_ACCESS_TOKEN })
         });
         const data = await res.json();
 
@@ -177,7 +182,7 @@ async function verifyAndInstall() {
         const res = await fetch(`${API_BASE}/api/sign/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jobId: currentJobId, code })
+            body: JSON.stringify({ jobId: currentJobId, code, accessToken: MY_ACCESS_TOKEN })
         });
         const data = await res.json();
 
