@@ -9,7 +9,7 @@
       "version": "1.0.0",
       "versionDate": "2026-11-21",
       "size": 4823449,
-      "downloadURL": "https://github.com/RMTechStudio/ForgeSign-iOS/releases/download/v1.0.0/ForgeSign-latest.ipa",
+      "downloadURL": "https://github.com/RMTechStudio/rm-sideload/releases/download/v1.0.0/ForgeSign-latest.ipa",
       "developerName": "RMTechStudio",
       "localizedDescription": "用於每 7 天在本地使用備用 Apple ID 重新簽名並覆蓋續簽。",
       "iconURL": "https://raw.githubusercontent.com/Mesutcydev/ForgeSign-iOS/main/App/Resources/Assets.xcassets/AppIcon.appiconset/icon.png"
